@@ -10,20 +10,32 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody2D rb2d;
     private Vector2 movement;
 
+    // Animations
+    private Animator playerAnimation;
 
 	// Use this for initialization
 	void Start () {
-        rb2d = GetComponent<Rigidbody2D>();	
-	}
+        rb2d = GetComponent<Rigidbody2D>();
+        playerAnimation = GetComponent<Animator>();
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
         movement = playerMovement();
 
+        if (HasUpdatePlayerAnimation()) {
+            ChangePlayerPositionView(movement);
+            changePlayerAnimationToWalking();
+        }
+        else {
+            ChangePlayerAnimationToIdle();
+        }
+
 	}
 
     void FixedUpdate() {
-        movePlayer(movement);
+        MovePlayer(movement);
     }
 
     // Start Private methods
@@ -34,7 +46,7 @@ public class PlayerController : MonoBehaviour {
     //    0: Any keyword is pressed
     //    1: "D" or rigth array keyword is pressed
     //   -1: "A" or left array keyword is pressed
-    private float onHorizontalKeywordPressed() {
+    private float OnHorizontalKeywordPressed() {
         return Input.GetAxisRaw("Horizontal");
     }
 
@@ -44,7 +56,7 @@ public class PlayerController : MonoBehaviour {
     //    0: Any keyword is pressed
     //    1: "W" or up array keyword is pressed
     //   -1: "S" or bottom array keyword is pressed
-    private float onVerticalKeywordPressed()
+    private float OnVerticalKeywordPressed()
     {
         return Input.GetAxisRaw("Vertical");
     }
@@ -52,13 +64,36 @@ public class PlayerController : MonoBehaviour {
     // Return a vector with the next player movement
     private Vector2 playerMovement() {
         return new Vector2(
-            onHorizontalKeywordPressed(),
-            onVerticalKeywordPressed()
+            OnHorizontalKeywordPressed(),
+            OnVerticalKeywordPressed()
         );
     }
 
-    private void movePlayer(Vector2 movement) {
+    // Move the player to a position X, Y
+    private void MovePlayer(Vector2 movement) {
         rb2d.MovePosition(rb2d.position + movement * speed * Time.deltaTime);
+    }
+
+    // Because the player only move when user press on keyword
+    // Return true is player need move
+    private bool HasUpdatePlayerAnimation() {
+        return movement != Vector2.zero;
+    }
+
+    private void ChangePlayerPositionView(Vector2 movement) {
+        playerAnimation.SetFloat("PositionX", movement.x);
+        playerAnimation.SetFloat("PositionY", movement.y);
+    }
+
+    // When user press any array keywords, we change the player animation
+    // to simulate is walking
+    private void changePlayerAnimationToWalking() {
+        playerAnimation.SetBool("walking", true);
+    }
+
+    // When user stop pressing any array keyword the player should be stop
+    private void ChangePlayerAnimationToIdle() {
+        playerAnimation.SetBool("walking", false);
     }
     // End Private methods
 }
