@@ -13,11 +13,17 @@ public class PlayerController : MonoBehaviour {
     // Animations
     private Animator playerAnimation;
 
+    // Initial map
+    public GameObject initialMap;
+
+
 	// Use this for initialization
 	void Start () {
         rb2d = GetComponent<Rigidbody2D>();
         playerAnimation = GetComponent<Animator>();
 
+        // Executing SetBount method from CameraController.cs
+        Camera.main.GetComponent<CameraController>().SetBound(initialMap);
     }
 	
 	// Update is called once per frame
