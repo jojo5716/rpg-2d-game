@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour {
     // Movements
     public float speed = 4f;
 
-    // Collider
+    // Player collider
     private Rigidbody2D rb2d;
     private Vector2 movement;
 
@@ -16,11 +16,20 @@ public class PlayerController : MonoBehaviour {
     // Initial map
     public GameObject initialMap;
 
+    // Attacking
+    CircleCollider2D attackCollider;
+
+    bool movePrevent;
+
 
 	// Use this for initialization
 	void Start () {
         rb2d = GetComponent<Rigidbody2D>();
         playerAnimation = GetComponent<Animator>();
+
+        attackCollider = transform.GetChild(0).GetComponent<CircleCollider2D>();
+        attackCollider.enabled = false;
+
 
         // Executing SetBount method from CameraController.cs
         Camera.main.GetComponent<CameraController>().SetBound(initialMap);
@@ -28,7 +37,7 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        movement = playerMovement();
+        movement = PlayerMovement();
 
         if (HasUpdatePlayerAnimation()) {
             ChangePlayerPositionView(movement);
@@ -38,7 +47,12 @@ public class PlayerController : MonoBehaviour {
             ChangePlayerAnimationToIdle();
         }
 
-	}
+        SwordAttack();
+
+        PreventMovement();
+
+
+    }
 
     void FixedUpdate() {
         MovePlayer(movement);
@@ -68,7 +82,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     // Return a vector with the next player movement
-    private Vector2 playerMovement() {
+    private Vector2 PlayerMovement() {
         return new Vector2(
             OnHorizontalKeywordPressed(),
             OnVerticalKeywordPressed()
@@ -101,5 +115,43 @@ public class PlayerController : MonoBehaviour {
     private void ChangePlayerAnimationToIdle() {
         playerAnimation.SetBool("walking", false);
     }
+
+    // Set animation when space keyword is pressed
+    private void SwordAttack() {
+        AnimatorStateInfo stateInfo = playerAnimation.GetCurrentAnimatorStateInfo(0);
+        bool isAttacking = stateInfo.IsName("Player_attack");
+
+        if (Input.GetKeyDown("space") && !isAttacking) {
+            playerAnimation.SetTrigger("attacking");
+        }
+
+        if (HasUpdatePlayerAnimation()) {
+            attackCollider.offset = new Vector2(movement.x / 2, movement.y /2);
+        }
+
+        if (isAttacking) {
+            float playBackTime = stateInfo.normalizedTime;
+
+            if (playBackTime > 0.33 && playBackTime < 0.66) {
+                attackCollider.enabled = true;
+            } else {
+                attackCollider.enabled = false;
+            }
+        }
+    }
+
+    // When player is loading the power we can't move
+    void PreventMovement() {
+        if (movePrevent) {
+            movement = Vector2.zero;
+        }
+    }
+
+    // Waiting to move again
+    IEnumerator EnableMovementAfter(float seconds) {
+        yield return new WaitForSeconds(seconds);
+        movePrevent = false;
+    }
+
     // End Private methods
 }

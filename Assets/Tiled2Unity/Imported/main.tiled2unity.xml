@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <!--Tiled2Unity generated xml data-->
 <!--Do not modify by hand-->
-<!--Last exported: 13/10/2017 22:14:47-->
+<!--Last exported: 14/10/2017 9:39:45-->
 <Tiled2Unity version="1.0.12.4">
   <AssignMaterial mesh="main_mesh_0001" material="Overworld" />
   <AssignMaterial mesh="main_mesh_0002" material="Overworld" />
@@ -162,7 +162,7 @@
       <GameObject name="PolylineObject" x="28.65625" y="-5.43668127" rotation="0" layer="">
         <PolylineObjectComponent tmx-object-id="9" tmx-object-name="" tmx-object-type="" tmx-object-x="458.5" tmx-object-y="86.9869" tmx-object-width="0" tmx-object-height="0" tmx-object-rotation="0" />
         <EdgeCollider2D>
-          <Points>0,0 0.09375,-2.971581 -2,-3.063481 -1.96875,-3.982531 -3.09375,-4.013163 -2.96875,-5.984006 -4.114581,-6.02485 -4.09375,-7.740375 1.302081,-7.72 1.302081,0.02042325 0.03125,0.04084644</Points>
+          <Points>0.09090938,-0.01136362 0.1392044,-3.369306 -1.875,-3.358938 -1.821025,-4.243894 -2.934656,-4.285894 -2.855113,-6.279438 -3.864581,-6.308938 -3.863637,-7.574187 1.317706,-7.5325 1.302081,0.02042325 0.1221594,0.02948281</Points>
         </EdgeCollider2D>
       </GameObject>
     </GameObject>
