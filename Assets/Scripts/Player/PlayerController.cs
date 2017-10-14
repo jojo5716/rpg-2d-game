@@ -18,6 +18,12 @@ public class PlayerController : MonoBehaviour {
 
     // Attacking
     CircleCollider2D attackCollider;
+    // Slash attack
+    public GameObject slashPrefab;
+
+
+    // Aura
+    Aura aura;
 
     bool movePrevent;
 
@@ -30,7 +36,7 @@ public class PlayerController : MonoBehaviour {
         attackCollider = transform.GetChild(0).GetComponent<CircleCollider2D>();
         attackCollider.enabled = false;
 
-
+        aura = transform.GetChild(1).GetComponent<Aura>();
         // Executing SetBount method from CameraController.cs
         Camera.main.GetComponent<CameraController>().SetBound(initialMap);
     }
@@ -48,6 +54,8 @@ public class PlayerController : MonoBehaviour {
         }
 
         SwordAttack();
+
+        SlashAttack();
 
         PreventMovement();
 
@@ -140,6 +148,48 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    private void SlashAttack() {
+        AnimatorStateInfo stateInfo = playerAnimation.GetCurrentAnimatorStateInfo(0);
+        bool isLoading = stateInfo.IsName("Player_slash");
+
+        if (Input.GetKeyDown(KeyCode.LeftAlt)) {
+            playerAnimation.SetTrigger("loading");
+            aura.StartAura();
+            
+        } else if (Input.GetKeyUp(KeyCode.LeftAlt)) {
+            playerAnimation.SetTrigger("attacking");
+
+            if (aura.IsLoaded()) {
+                float[] anglePosition = GetAnglePosition();
+
+                float angle = Mathf.Atan2(
+                    anglePosition[0],
+                    anglePosition[1]
+                ) * Mathf.Rad2Deg;
+
+                // Creamos la instancia de Slash
+                GameObject slashObj = Instantiate(slashPrefab, transform.position, Quaternion.AngleAxis(angle, Vector3.forward));
+
+                // Asignamos el movimiento
+                Slash slash = slashObj.GetComponent<Slash>();
+                slash.movement.x = playerAnimation.GetFloat("PositionX");
+                slash.movement.y = playerAnimation.GetFloat("PositionY");
+            }
+
+            aura.StopAura();
+
+            // Wait a few seconds to keep moving
+            StartCoroutine(EnableMovementAfter(0.4f));
+        }
+
+    }
+
+    private float[] GetAnglePosition() {
+        return new float[] {
+            playerAnimation.GetFloat("PositionY"),
+            playerAnimation.GetFloat("PositionX")
+        };
+    }
     // When player is loading the power we can't move
     void PreventMovement() {
         if (movePrevent) {
